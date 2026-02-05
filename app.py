@@ -16,11 +16,15 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Aiven MySQL Database Configuration with SSL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_2KHrBK5j1HOPu4hc21y@mysql-d0f4f89-yifrubehailu02-c524.l.aivencloud.com:10271/defaultdb?ssl_mode=REQUIRED'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://avnadmin:AVNS_2KHrBK5j1HOPu4hc21y@mysql-d0f4f89-yifrubehailu02-c524.l.aivencloud.com:10271/defaultdb?ssl_mode=REQUIRED')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_recycle': 280,
     'pool_pre_ping': True,
+    'connect_args': {
+        'ssl': {
+            'ca': '/etc/ssl/certs/ca-certificates.crt' # ይህ በ Render ላይ ይሰራል
+        }  
 }
 
 # Allowed file extensions for profile photos
@@ -698,4 +702,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     socketio.run(app, debug=False, host='0.0.0.0', port=port)
+
 

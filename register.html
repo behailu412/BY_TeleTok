@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTok - Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h2 {
+            color: #333;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .phone-format-info {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .phone-format-info h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .phone-format-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .phone-format-info li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .phone-format-info li i {
+            color: #4cd964;
+            font-size: 0.9rem;
+        }
+
+        .password-strength {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 5px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            background: #ff4757;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .strength-fill.weak { width: 33%; background: #ff4757; }
+        .strength-fill.fair { width: 66%; background: #ffa502; }
+        .strength-fill.good { width: 100%; background: #2ed573; }
+
+        .strength-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 60px;
+        }
+
+        .strength-text.weak { color: #ff4757; }
+        .strength-text.fair { color: #ffa502; }
+        .strength-text.good { color: #2ed573; }
+
+        .password-requirements {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #ff4757;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 20px;
+            padding: 10px;
+            background: rgba(255, 71, 87, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+        }
+
+        .success-message {
+            color: #2ed573;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 20px;
+            padding: 10px;
+            background: rgba(46, 213, 115, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .register-card {
+                padding: 30px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2.8rem;
+            }
+            
+            .register-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .form-control {
+                font-size: 1rem;
+                padding: 12px 12px 12px 40px;
+            }
+            
+            .back-button {
+                top: 10px;
+                left: 10px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='login.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <div class="container">
+        <div class="logo">
+            <h1>TeleTok</h1>
+            <p>Join our growing community</p>
+        </div>
+        
+        <div class="register-card">
+            <div class="register-header">
+                <h2>Create Account</h2>
+                <p>Sign up to start chatting with friends</p>
+            </div>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" class="form-control" 
+                               placeholder="Choose a username" required minlength="3" maxlength="20">
+                    </div>
+                    <div class="password-requirements">
+                        3-20 characters, letters and numbers only
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone" class="form-control" 
+                               placeholder="Enter Ethiopian phone number" required>
+                    </div>
+                    
+                    <div class="phone-format-info">
+                        <h4>Acceptable Formats:</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> 09XXXXXXXX (10 digits)</li>
+                            <li><i class="fas fa-check-circle"></i> +2519XXXXXXXX (13 digits)</li>
+                            <li><i class="fas fa-check-circle"></i> 07XXXXXXXX (10 digits)</li>
+                        </ul>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #888;">
+                            <i class="fas fa-info-circle"></i> Each phone number can only be registered once.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="form-control" 
+                               placeholder="Create a strong password" required minlength="6">
+                    </div>
+                    
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText">Weak</div>
+                    </div>
+                    
+                    <div class="password-requirements">
+                        Minimum 6 characters. Include uppercase, lowercase, and numbers for better security.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" class="form-control" 
+                               placeholder="Re-enter your password" required>
+                    </div>
+                    <div class="password-requirements" id="passwordMatchText"></div>
+                </div>
+                
+                <button type="submit" class="btn" id="registerBtn">
+                    <span id="registerBtnText">Create Account</span>
+                    <i class="fas fa-user-plus"></i>
+                    <div class="loading" id="registerLoading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+                
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+                
+                <div class="login-link">
+                    Already have an account? <a href="login.html">Sign in here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Validate Ethiopian phone number
+        function validateEthiopianPhone(phone) {
+            // Remove spaces
+            phone = phone.replace(/\s+/g, '');
+            
+            // Patterns for Ethiopian phone numbers
+            const patterns = [
+                /^09\d{8}$/,          // 0912345678
+                /^\+2519\d{8}$/,      // +251912345678
+                /^2519\d{8}$/,        // 251912345678
+                /^07\d{8}$/           // 0712345678
+            ];
+            
+            return patterns.some(pattern => pattern.test(phone));
+        }
+
+        // Format phone number as user types
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            
+            // Add country code prefix if needed
+            if (value.startsWith('251')) {
+                value = '+' + value;
+            } else if (value.startsWith('9') && value.length === 9) {
+                value = '0' + value;
+            } else if (value.startsWith('7') && value.length === 9) {
+                value = '0' + value;
+            }
+            
+            input.value = value;
+        }
+
+        // Check password strength
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 6) strength++;
+            if (password.length >= 8) strength++;
+            
+            // Character type checks
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            return strength;
+        }
+
+        // Update password strength indicator
+        function updatePasswordStrength(password) {
+            const strength = checkPasswordStrength(password);
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+            
+            if (password.length === 0) {
+                fill.className = 'strength-fill';
+                fill.style.width = '0%';
+                text.textContent = '';
+                text.className = 'strength-text';
+                return;
+            }
+            
+            if (strength <= 2) {
+                fill.className = 'strength-fill weak';
+                text.textContent = 'Weak';
+                text.className = 'strength-text weak';
+            } else if (strength <= 4) {
+                fill.className = 'strength-fill fair';
+                text.textContent = 'Fair';
+                text.className = 'strength-text fair';
+            } else {
+                fill.className = 'strength-fill good';
+                text.textContent = 'Good';
+                text.className = 'strength-text good';
+            }
+        }
+
+        // Check if passwords match
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchText = document.getElementById('passwordMatchText');
+            
+            if (confirmPassword.length === 0) {
+                matchText.textContent = '';
+                matchText.style.color = '';
+                return true;
+            }
+            
+            if (password === confirmPassword) {
+                matchText.textContent = '✓ Passwords match';
+                matchText.style.color = '#2ed573';
+                return true;
+            } else {
+                matchText.textContent = '✗ Passwords do not match';
+                matchText.style.color = '#ff4757';
+                return false;
+            }
+        }
+
+        // Validate username (alphanumeric only)
+        function validateUsername(username) {
+            return /^[a-zA-Z0-9_]{3,20}$/.test(username);
+        }
+
+        // Initialize form validation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Phone number formatting
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', () => formatPhoneNumber(phoneInput));
+            
+            // Password strength checking
+            const passwordInput = document.getElementById('password');
+            passwordInput.addEventListener('input', () => updatePasswordStrength(passwordInput.value));
+            
+            // Password match checking
+            const confirmInput = document.getElementById('confirmPassword');
+            confirmInput.addEventListener('input', checkPasswordMatch);
+        });
+
+        // Form submission handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('username').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Get UI elements
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            const btnText = document.getElementById('registerBtnText');
+            const loading = document.getElementById('registerLoading');
+            const registerBtn = document.getElementById('registerBtn');
+            
+            // Clear messages
+            errorEl.textContent = '';
+            successEl.textContent = '';
+            
+            // Validate username
+            if (!validateUsername(username)) {
+                errorEl.textContent = 'Username must be 3-20 characters and can only contain letters, numbers, and underscores.';
+                return;
+            }
+            
+            // Validate phone number
+            if (!validateEthiopianPhone(phone)) {
+                errorEl.textContent = 'Please enter a valid Ethiopian phone number in one of these formats: 09XXXXXXXX, +2519XXXXXXXX, or 07XXXXXXXX';
+                return;
+            }
+            
+            // Validate password
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters long.';
+                return;
+            }
+            
+            // Check password match
+            if (!checkPasswordMatch()) {
+                errorEl.textContent = 'Passwords do not match.';
+                return;
+            }
+            
+            // Disable button and show loading
+            registerBtn.disabled = true;
+            btnText.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                // Send registration request
+                const response = await fetch('${window.location.origin}/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        phone: phone,
+                        password: password
+                    }),
+                    credentials: 'include' // Important for cookies/session
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successEl.textContent = 'Registration successful! Redirecting to dashboard...';
+                    
+                    // Store user data in sessionStorage
+                    sessionStorage.setItem('user_id', data.user_id);
+                    sessionStorage.setItem('username', data.username);
+                    sessionStorage.setItem('phone', data.phone || '');
+                    sessionStorage.setItem('profile_photo', data.profile_photo || 'default.jpg');
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    errorEl.textContent = data.message || 'Registration failed. Please try again.';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please check your connection and try again.';
+                console.error('Registration error:', error);
+            } finally {
+                // Re-enable button
+                registerBtn.disabled = false;
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        });
+
+        // Auto-focus username field
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('username').focus();
+        });
+
+        // Real-time validation
+        document.getElementById('username').addEventListener('blur', function() {
+            const username = this.value.trim();
+            if (username.length > 0 && !validateUsername(username)) {
+                this.style.borderColor = '#ff4757';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+
+        document.getElementById('phone').addEventListener('blur', function() {
+            const phone = this.value.trim();
+            if (phone.length > 0 && !validateEthiopianPhone(phone)) {
+                this.style.borderColor = '#ff4757';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+    </script>
+</body>
+</html>

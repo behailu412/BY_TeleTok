@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTok - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .phone-hint {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            color: #ff4757;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 20px;
+        }
+
+        .success-message {
+            color: #2ed573;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 20px;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+            
+            .form-control {
+                font-size: 1rem;
+                padding: 12px 12px 12px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>TeleTok</h1>
+            <p>Connect with friends instantly</p>
+            <p>Developed By Behailu !!!</p>
+        </div>
+        
+        <div class="auth-card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('login')">Login</div>
+                <div class="tab" onclick="switchTab('register')">Register</div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="login-tab" class="tab-content active">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginPhone">Phone Number</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="loginPhone" class="form-control" 
+                                   placeholder="09XXXXXXXX or +2519XXXXXXXX" required>
+                        </div>
+                        <div class="phone-hint">Enter your registered Ethiopian phone number</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="loginPassword" class="form-control" 
+                                   placeholder="Enter your password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        <span id="loginBtnText">Login</span>
+                        <i class="fas fa-sign-in-alt"></i>
+                        <div class="loading" id="loginLoading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                    
+                    <div class="error-message" id="loginError"></div>
+                    <div class="success-message" id="loginSuccess"></div>
+                </form>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="register-tab" class="tab-content">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="regUsername" class="form-control" 
+                                   placeholder="Choose a username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPhone">Phone Number</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="regPhone" class="form-control" 
+                                   placeholder="09XXXXXXXX or +2519XXXXXXXX" required>
+                        </div>
+                        <div class="phone-hint">Ethiopian format: 09XXXXXXXX, +2519XXXXXXXX, or 07XXXXXXXX</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="regPassword" class="form-control" 
+                                   placeholder="Minimum 6 characters" required minlength="6">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirm Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="regConfirmPassword" class="form-control" 
+                                   placeholder="Re-enter your password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        <span id="regBtnText">Create Account</span>
+                        <i class="fas fa-user-plus"></i>
+                        <div class="loading" id="regLoading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </button>
+                    
+                    <div class="error-message" id="regError"></div>
+                    <div class="success-message" id="regSuccess"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            if (tabName === 'login') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('login-tab').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('register-tab').classList.add('active');
+            }
+            
+            // Clear messages
+            document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        function validateEthiopianPhone(phone) {
+            // Remove spaces
+            phone = phone.replace(/\s+/g, '');
+            
+            // Patterns for Ethiopian phone numbers
+            const patterns = [
+                /^09\d{8}$/,          // 0912345678
+                /^\+2519\d{8}$/,      // +251912345678
+                /^2519\d{8}$/,        // 251912345678
+                /^07\d{8}$/           // 0712345678
+            ];
+            
+            return patterns.some(pattern => pattern.test(phone));
+        }
+
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('loginPhone').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            const successEl = document.getElementById('loginSuccess');
+            const btnText = document.getElementById('loginBtnText');
+            const loading = document.getElementById('loginLoading');
+            
+            // Clear messages
+            errorEl.textContent = '';
+            successEl.textContent = '';
+            
+            // Validate phone
+            if (!validateEthiopianPhone(phone)) {
+                errorEl.textContent = 'Please enter a valid Ethiopian phone number';
+                return;
+            }
+            
+            // Show loading
+            btnText.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch('${window.location.origin}/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        password: password
+                    }),
+                    credentials: 'include' // Important for cookies/session
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successEl.textContent = 'Login successful! Redirecting...';
+                    
+                    // Store user data in sessionStorage
+                    sessionStorage.setItem('user_id', data.user_id);
+                    sessionStorage.setItem('username', data.username);
+                    sessionStorage.setItem('phone', data.phone || '');
+                    sessionStorage.setItem('profile_photo', data.profile_photo || 'default.jpg');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    errorEl.textContent = data.message || 'Login failed';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please try again.';
+                console.error('Login error:', error);
+            } finally {
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        });
+
+        // Register Form Handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('regUsername').value;
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const errorEl = document.getElementById('regError');
+            const successEl = document.getElementById('regSuccess');
+            const btnText = document.getElementById('regBtnText');
+            const loading = document.getElementById('regLoading');
+            
+            // Clear messages
+            errorEl.textContent = '';
+            successEl.textContent = '';
+            
+            // Validate inputs
+            if (username.length < 3) {
+                errorEl.textContent = 'Username must be at least 3 characters';
+                return;
+            }
+            
+            if (!validateEthiopianPhone(phone)) {
+                errorEl.textContent = 'Please enter a valid Ethiopian phone number';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            // Show loading
+            btnText.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch('${window.location.origin}/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        phone: phone,
+                        password: password
+                    }),
+                    credentials: 'include' // Important for cookies/session
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successEl.textContent = 'Registration successful! Redirecting...';
+                    
+                    // Store user data in sessionStorage
+                    sessionStorage.setItem('user_id', data.user_id);
+                    sessionStorage.setItem('username', data.username);
+                    sessionStorage.setItem('phone', data.phone || '');
+                    sessionStorage.setItem('profile_photo', data.profile_photo || 'default.jpg');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    errorEl.textContent = data.message || 'Registration failed';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Network error. Please try again.';
+                console.error('Registration error:', error);
+            } finally {
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        });
+
+        // Auto-format phone number
+        document.querySelectorAll('input[type="tel"]').forEach(input => {
+            input.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                if (value.startsWith('251')) {
+                    value = '+' + value;
+                } else if (value.startsWith('9') && value.length === 9) {
+                    value = '0' + value;
+                } else if (value.startsWith('7') && value.length === 9) {
+                    value = '0' + value;
+                }
+                
+                e.target.value = value;
+            });
+        });
+    </script>
+</body>
+</html>

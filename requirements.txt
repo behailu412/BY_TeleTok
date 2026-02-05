@@ -1,0 +1,14 @@
+Flask
+Flask-SocketIO
+Flask-CORS
+Flask-SQLAlchemy
+SQLAlchemy
+PyMySQL
+python-socketio
+python-engineio
+cryptography
+Pillow
+gunicorn
+gevent
+gevent-websocket
+greenlet

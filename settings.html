@@ -1,0 +1,1109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTok - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .settings-header h2 {
+            color: #333;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .settings-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-photo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #f0f2f5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .profile-photo:hover {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .change-photo-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .change-photo-btn:hover {
+            background: #764ba2;
+            transform: scale(1.1);
+        }
+
+        .profile-info {
+            margin-top: 15px;
+        }
+
+        .profile-info h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-info p {
+            color: #666;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #444;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+
+        .input-hint {
+            display: block;
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 8px;
+            margin-left: 5px;
+        }
+
+        .photo-input {
+            display: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            margin-top: 25px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+        }
+
+        .error-message {
+            color: #ff4757;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 20px;
+            padding: 12px;
+            background: rgba(255, 71, 87, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            line-height: 1.4;
+        }
+
+        .success-message {
+            color: #2ed573;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 20px;
+            padding: 12px;
+            background: rgba(46, 213, 115, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+            line-height: 1.4;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .photo-upload-hint {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        /* Slider Styles */
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 15px 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #764ba2;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-top: 8px;
+        }
+
+        /* Background Options */
+        .background-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .background-option {
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .background-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .background-option.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .bg-preview {
+            width: 60px;
+            height: 40px;
+            border-radius: 6px;
+            margin: 0 auto 8px;
+            border: 1px solid #ddd;
+        }
+
+        .background-option span {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* Custom Confirmation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirmation-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .modal-overlay.active .confirmation-modal {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b81 0%, #ff4757 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .modal-message {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-btn.cancel {
+            background: #f1f2f6;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+        }
+
+        .modal-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .settings-card {
+                padding: 30px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2.8rem;
+            }
+            
+            .settings-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .settings-header p {
+                font-size: 1rem;
+            }
+            
+            .profile-photo {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .form-control {
+                font-size: 1rem;
+                padding: 12px 15px;
+            }
+            
+            .back-button {
+                top: 10px;
+                left: 10px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .btn {
+                padding: 14px;
+                font-size: 1.1rem;
+            }
+
+            .confirmation-modal {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
+            .modal-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
+            .modal-title {
+                font-size: 1.6rem;
+            }
+
+            .modal-message {
+                font-size: 1rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='dashboard.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="confirmation-modal">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h2 class="modal-title">Logout Confirmation</h2>
+                <p class="modal-message">Are you sure you want to logout from TeleTok? You'll need to log back in to continue chatting.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelLogout">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button class="modal-btn confirm" id="confirmLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Yes, Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="logo">
+            <h1>TeleTok</h1>
+            <p>Manage your profile settings</p>
+        </div>
+        
+        <div class="settings-card">
+            <div class="settings-header">
+                <h2>Profile Settings</h2>
+                <p>Update your profile information</p>
+            </div>
+            
+            <div class="profile-section">
+                <div class="profile-photo-container" onclick="document.getElementById('photoInput').click()">
+                    <img id="profilePhoto" src="default.jpg" alt="Profile" class="profile-photo">
+                    <button class="change-photo-btn">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <div class="profile-info">
+                    <h3 id="currentUsername">User</h3>
+                    <p id="currentPhone">Phone number</p>
+                </div>
+                <p class="photo-upload-hint">Click on your photo to upload a new one</p>
+            </div>
+            
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" 
+                           placeholder="Enter new username">
+                    <span class="input-hint">You can use any characters for your username</span>
+                </div>
+                
+                <input type="file" id="photoInput" class="photo-input" accept="image/*">
+                
+                <button type="submit" class="btn" id="updateBtn">
+                    <span class="spinner" id="updateSpinner" style="display: none;"></span>
+                    <span id="updateBtnText">Update Profile</span>
+                    <i class="fas fa-save"></i>
+                </button>
+                
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+            </form>
+            
+            <!-- Text Size Settings -->
+            <div class="form-group">
+                <label for="textSizeSlider">Text Size</label>
+                <input type="range" id="textSizeSlider" class="slider" min="12" max="24" value="16">
+                <div class="slider-value" id="textSizeValue">16px</div>
+            </div>
+            
+            <!-- Background Settings -->
+            <div class="form-group">
+                <label for="backgroundSelector">Dashboard Background</label>
+                <div class="background-options">
+                    <div class="background-option active" data-bg="default">
+                        <div class="bg-preview" style="background: #f0f2f5;"></div>
+                        <span>Default</span>
+                    </div>
+                    <div class="background-option" data-bg="blue">
+                        <div class="bg-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        <span>Blue Gradient</span>
+                    </div>
+                    <div class="background-option" data-bg="green">
+                        <div class="bg-preview" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);"></div>
+                        <span>Green Gradient</span>
+                    </div>
+                    <div class="background-option" data-bg="purple">
+                        <div class="bg-preview" style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);"></div>
+                        <span>Purple Gradient</span>
+                    </div>
+                    <div class="background-option" data-bg="sunset">
+                        <div class="bg-preview" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);"></div>
+                        <span>Sunset</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" id="saveSettingsBtn">
+                <span id="saveSettingsBtnText">Save Settings</span>
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            
+            <button class="btn logout-btn" id="logoutBtn">
+                <span id="logoutBtnText">Logout</span>
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const profilePhoto = document.getElementById('profilePhoto');
+        const currentUsername = document.getElementById('currentUsername');
+        const currentPhone = document.getElementById('currentPhone');
+        const usernameInput = document.getElementById('username');
+        const photoInput = document.getElementById('photoInput');
+        const settingsForm = document.getElementById('settingsForm');
+        const updateBtn = document.getElementById('updateBtn');
+        const updateBtnText = document.getElementById('updateBtnText');
+        const updateSpinner = document.getElementById('updateSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogoutBtn = document.getElementById('cancelLogout');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        let currentUser = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadUserProfile();
+            setupEventListeners();
+        });
+
+        function checkAuth() {
+            const userId = sessionStorage.getItem('user_id');
+            const username = sessionStorage.getItem('username');
+            const phone = sessionStorage.getItem('phone');
+
+            if (!userId || !username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = {
+                id: userId,
+                username: username,
+                phone: phone
+            };
+
+            currentUsername.textContent = username;
+            if (phone) currentPhone.textContent = phone;
+            
+            // Load profile photo
+            const profilePhotoUrl = sessionStorage.getItem('profile_photo') || 'default.jpg';
+            profilePhoto.src = profilePhotoUrl === 'default.jpg' ? 'default.jpg' : `/uploads/${profilePhotoUrl}`;
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/get_profile');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        currentUsername.textContent = data.username;
+                        currentPhone.textContent = data.phone;
+                        profilePhoto.src = `/uploads/${data.profile_photo}`;
+                        
+                        sessionStorage.setItem('username', data.username);
+                        sessionStorage.setItem('profile_photo', data.profile_photo);
+                    }
+                }
+            } catch (error) {
+                console.error('Load profile error:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            // Profile photo change
+            photoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        showError('File size must be less than 5MB');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profilePhoto.src = e.target.result;
+                        profilePhoto.style.borderColor = '#667eea';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Form submission
+            settingsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = usernameInput.value.trim();
+                const file = photoInput.files[0];
+                
+                if (!username && !file) {
+                    showError('Please enter a new username or select a photo');
+                    return;
+                }
+                
+                await updateProfile(username, file);
+            });
+
+            // Logout button click
+            logoutBtn.addEventListener('click', () => {
+                showLogoutModal();
+            });
+
+            // Modal buttons
+            cancelLogoutBtn.addEventListener('click', () => {
+                hideLogoutModal();
+            });
+
+            confirmLogoutBtn.addEventListener('click', async () => {
+                hideLogoutModal();
+                await logout();
+            });
+
+            // Close modal when clicking outside
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) {
+                    hideLogoutModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && logoutModal.classList.contains('active')) {
+                    hideLogoutModal();
+                }
+            });
+        }
+
+        function showLogoutModal() {
+            logoutModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+        }
+
+        function hideLogoutModal() {
+            logoutModal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        async function updateProfile(username, photoFile) {
+            showLoading(true);
+            clearMessages();
+
+            const formData = new FormData();
+            if (username) {
+                formData.append('username', username);
+            }
+            if (photoFile) {
+                formData.append('profile_photo', photoFile);
+            }
+
+            try {
+                const response = await fetch('/update_profile', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('Profile updated successfully!');
+                    
+                    // Update session storage
+                    if (data.username) {
+                        sessionStorage.setItem('username', data.username);
+                        currentUsername.textContent = data.username;
+                        usernameInput.value = '';
+                    }
+                    
+                    if (data.profile_photo) {
+                        sessionStorage.setItem('profile_photo', data.profile_photo);
+                        profilePhoto.src = `/uploads/${data.profile_photo}`;
+                        photoInput.value = '';
+                    }
+                    
+                    // Refresh after delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showError(data.message || 'Failed to update profile');
+                }
+            } catch (error) {
+                console.error('Update profile error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Clear session storage
+                    sessionStorage.clear();
+                    // Redirect to login
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still redirect even if error
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+
+        function showLoading(isLoading) {
+            if (isLoading) {
+                updateBtn.disabled = true;
+                updateSpinner.style.display = 'inline-block';
+                updateBtnText.textContent = 'Updating...';
+            } else {
+                updateBtn.disabled = false;
+                updateSpinner.style.display = 'none';
+                updateBtnText.textContent = 'Update Profile';
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            successMessage.textContent = '';
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            errorMessage.textContent = '';
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        function clearMessages() {
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        // Text Size Slider
+        const textSizeSlider = document.getElementById('textSizeSlider');
+        const textSizeValue = document.getElementById('textSizeValue');
+        
+        textSizeSlider.addEventListener('input', function() {
+            const size = this.value;
+            textSizeValue.textContent = `${size}px`;
+            
+            // Apply to settings page as preview
+            document.body.style.fontSize = `${size}px`;
+            
+            // Update the text size in real-time on the dashboard
+            localStorage.setItem('dashboard_text_size', size);
+            localStorage.setItem('dashboard_text_size_temp', size);
+            localStorage.setItem('dashboard_update_trigger', Date.now().toString());
+        });
+        
+        // Background Options
+        const backgroundOptions = document.querySelectorAll('.background-option');
+        
+        backgroundOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                backgroundOptions.forEach(opt => opt.classList.remove('active'));
+                // Add active class to clicked option
+                this.classList.add('active');
+                
+                // Save the selected background
+                const bgValue = this.getAttribute('data-bg');
+                localStorage.setItem('dashboard_background', bgValue);
+                
+                // Broadcast to all open dashboard windows/tabs
+                window.postMessage({
+                    type: 'update_settings',
+                    background: bgValue
+                }, window.location.origin);
+                
+                // If dashboard is open in another tab via opener, trigger update
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({
+                        type: 'update_settings',
+                        background: bgValue
+                    }, window.location.origin);
+                }
+                
+                // Show immediate preview
+                previewBackground(bgValue);
+            });
+        });
+        
+        function previewBackground(bgValue) {
+            console.log('Previewing background:', bgValue);
+            const body = document.body;
+            
+            // Remove any existing custom backgrounds
+            body.style.background = '';
+            
+            switch(bgValue) {
+                case 'default':
+                    body.style.background = '#f0f2f5';
+                    break;
+                case 'blue':
+                    body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    break;
+                case 'green':
+                    body.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                    break;
+                case 'purple':
+                    body.style.background = 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)';
+                    break;
+                case 'sunset':
+                    body.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)';
+                    break;
+                default:
+                    body.style.background = '#f0f2f5';
+            }
+            
+            // Update localStorage to trigger dashboard update
+            localStorage.setItem('dashboard_background_temp', bgValue);
+            // Also save the permanent setting
+            localStorage.setItem('dashboard_background', bgValue);
+            console.log('Set background temp value:', bgValue);
+            // Trigger storage event
+            const triggerValue = Date.now().toString();
+            localStorage.setItem('dashboard_update_trigger', triggerValue);
+            console.log('Trigger sent:', triggerValue);
+        }
+        
+        // Save Settings
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        
+        saveSettingsBtn.addEventListener('click', function() {
+            const textSize = textSizeSlider.value;
+            const selectedBgOption = document.querySelector('.background-option.active');
+            const bgValue = selectedBgOption.getAttribute('data-bg');
+            
+            // Save settings to localStorage
+            localStorage.setItem('dashboard_text_size', textSize);
+            localStorage.setItem('dashboard_background', bgValue);
+            
+            showSuccess('Settings saved successfully!');
+            
+            // Broadcast to all open dashboard windows/tabs
+            window.postMessage({
+                type: 'update_settings',
+                background: bgValue,
+                textSize: textSize
+            }, window.location.origin);
+            
+            // Trigger update on dashboard
+            localStorage.setItem('dashboard_text_size_temp', textSize);
+            localStorage.setItem('dashboard_background_temp', bgValue);
+            localStorage.setItem('dashboard_update_trigger', Date.now().toString());
+            console.log('Sent background update to dashboard:', bgValue);
+            
+            // Show success message temporarily
+            setTimeout(() => {
+                successMessage.textContent = '';
+                successMessage.style.display = 'none';
+            }, 3000);
+        });
+        
+        // Load saved settings on page load
+        function loadSavedSettings() {
+            const savedTextSize = localStorage.getItem('dashboard_text_size');
+            const savedBackground = localStorage.getItem('dashboard_background');
+            
+            if (savedTextSize) {
+                textSizeSlider.value = savedTextSize;
+                textSizeValue.textContent = `${savedTextSize}px`;
+                // Apply to settings page
+                document.body.style.fontSize = `${savedTextSize}px`;
+            }
+            
+            if (savedBackground) {
+                // Remove active class from all options
+                backgroundOptions.forEach(opt => opt.classList.remove('active'));
+                
+                // Find and activate the saved background option
+                const savedOption = document.querySelector(`.background-option[data-bg="${savedBackground}"]`);
+                if (savedOption) {
+                    savedOption.classList.add('active');
+                }
+                
+                // Apply background to settings page
+                previewBackground(savedBackground);
+            }
+        }
+        
+        // Call loadSavedSettings after page loads
+        window.addEventListener('load', loadSavedSettings);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2590 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleTok - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+        }
+
+        .user-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4cd964;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .search-container {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-top: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .search-result-item:hover {
+            background: #f5f5f5;
+        }
+
+        .search-result-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .contact-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .contact-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.3s;
+        }
+
+        .contact-item:hover {
+            background: #f5f5f5;
+        }
+
+        .contact-item.active {
+            background: #e8f0fe;
+            border-left: 4px solid #667eea;
+        }
+
+        .contact-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .contact-time {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .contact-message {
+            font-size: 0.95rem;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #4cd964;
+            border-radius: 50%;
+        }
+
+        .unread-badge {
+            background: #667eea;
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Chat Area Styles */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+        }
+
+        .chat-contact-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-contact-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #667eea;
+            cursor: pointer;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Make emojis larger in messages */
+        .message-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .message-text .emoji {
+            font-size: 2.2rem; /* Double the size for emojis */
+            line-height: 1.2;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+
+        /* Special styling for messages that contain only emojis */
+        .message:has(.message-text:has(.emoji:only-child)) .message-text {
+            font-size: 3rem; /* Even larger for emoji-only messages */
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 5px;
+            padding: 5px;
+            display: none;
+            gap: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .message:hover .message-actions {
+            display: flex;
+        }
+
+        .message-action-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 3px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .message-action-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.1);
+        }
+
+        .message-status {
+            font-size: 0.9rem;
+        }
+
+        .input-container {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            position: relative;
+        }
+
+        .emoji-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #667eea;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .emoji-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: none;
+            min-height: 50px;
+            max-height: 100px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Custom context menu for paste option */
+        .custom-context-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10000;
+            display: none;
+            min-width: 120px;
+        }
+
+        .context-menu-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .context-menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .context-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 5px 0;
+        }
+
+        /* Reply message styling */
+        /* Professional Reply Styling */
+        .reply-container {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.08);
+            border-left: 3px solid #667eea;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .reply-label {
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reply-label i {
+            font-size: 0.8rem;
+        }
+
+        .reply-sender {
+            font-weight: 600;
+            color: #764ba2;
+        }
+
+        .reply-content {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            padding-left: 10px;
+            border-left: 2px solid rgba(102, 126, 234, 0.2);
+            margin-left: 4px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+
+        .reply-separator {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .reply-separator::before,
+        .reply-separator::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #667eea, transparent);
+        }
+
+        .reply-separator-text {
+            padding: 0 12px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #764ba2;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .main-reply {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            padding-left: 5px;
+        }
+
+        /* Emoji styling for reply content */
+        .reply-content .emoji {
+            font-size: 1.6rem;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+
+        /* Scrollbar for long reply content */
+        .reply-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .reply-content::-webkit-scrollbar-track {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 2px;
+        }
+
+        .reply-content::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 2px;
+        }
+
+        .reply-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.5);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Enhanced Emoji Picker Styles */
+        .emoji-picker {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            width: 320px;
+            max-height: 400px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .emoji-picker.active {
+            display: flex;
+        }
+
+        .emoji-header {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .emoji-header h4 {
+            margin: 0;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .emoji-categories {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .emoji-category {
+            padding: 8px 12px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+            margin-right: 5px;
+        }
+
+        .emoji-category:hover {
+            background: #f0f0f0;
+        }
+
+        .emoji-category.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .emoji-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+        }
+
+        .emoji-item {
+            font-size: 1.8rem; /* Larger emojis in picker */
+            cursor: pointer;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .emoji-item:hover {
+            background: #f0f0f0;
+            transform: scale(1.2); /* More noticeable hover effect */
+        }
+
+        .no-chat-selected {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .no-chat-selected i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+
+        .no-chat-selected h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .no-chat-selected p {
+            font-size: 1.1rem;
+        }
+
+        /* Toast Notification Styles */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2ed573 0%, #1dd1a1 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(46, 213, 115, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 350px;
+        }
+
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+
+        .toast-notification.hide {
+            transform: translateX(150%);
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+        }
+
+        .toast-message {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 0 0 10px 10px;
+            width: 100%;
+            transform-origin: left;
+            animation: toastProgress 3s linear forwards;
+        }
+
+        @keyframes toastProgress {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                z-index: 1000;
+                transform: translateX(-100%);
+            }
+
+            /* Mobile keyboard handling */
+            .input-container.keyboard-visible {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 15px;
+                background: white;
+                border-top: 1px solid #e0e0e0;
+                z-index: 1001;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            }
+
+            .chat-area.keyboard-visible {
+                padding-bottom: 250px; /* Adjust based on typical keyboard height */
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .chat-area {
+                width: 100%;
+            }
+
+            .message {
+                max-width: 85%;
+                font-size: 1.2rem;
+            }
+
+            .message-text {
+                font-size: 1.2rem;
+            }
+
+            .message-text .emoji {
+                font-size: 2.4rem; /* Larger emojis on mobile */
+            }
+
+            .message:has(.message-text:has(.emoji:only-child)) .message-text {
+                font-size: 3.5rem; /* Even larger for emoji-only messages on mobile */
+            }
+
+            .search-results {
+                position: fixed;
+                top: 130px;
+                left: 20px;
+                right: 20px;
+            }
+
+            .emoji-picker {
+                width: 280px;
+                left: 10px;
+                bottom: 70px;
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 6px;
+            }
+
+            .emoji-item {
+                font-size: 1.6rem;
+                padding: 8px;
+            }
+
+            .toast-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .emoji-picker {
+                width: 250px;
+                left: 5px;
+            }
+
+            /* Additional mobile keyboard handling for small screens */
+            .input-container.keyboard-visible {
+                padding: 12px;
+            }
+
+            .chat-area.keyboard-visible {
+                padding-bottom: 220px; /* Slightly less padding for smaller screens */
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .emoji-item {
+                font-size: 1.5rem;
+            }
+
+            .message-text .emoji {
+                font-size: 2.6rem; /* Even larger emojis on small mobile */
+            }
+
+            .message:has(.message-text:has(.emoji:only-child)) .message-text {
+                font-size: 4rem; /* Extra large for emoji-only messages on small mobile */
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Settings Button */
+        .settings-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            align-self: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #888;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Scrollbar styling */
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-profile">
+                    <img id="userProfilePhoto" src="default.jpg" alt="Profile" class="profile-photo">
+                    <div class="user-info">
+                        <h3 id="usernameDisplay">User</h3>
+                        <div class="user-status">
+                            <span class="status-dot"></span>
+                            <span id="userStatus">Online</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="settings-btn" onclick="window.location.href='settings.html'">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by username or phone...">
+                    <i class="fas fa-search"></i>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+
+            <div class="contact-list" id="contactList">
+                <!-- Contacts will be loaded here -->
+                <div class="spinner" id="contactsSpinner"></div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea">
+            <div class="chat-header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="chat-contact-info" id="chatContactInfo" style="display: none;">
+                    <img id="chatContactPhoto" src="" alt="Contact">
+                    <div>
+                        <h3 id="chatContactName">Contact Name</h3>
+                        <div id="chatContactStatus" class="user-status">
+                            <span class="status-dot"></span>
+                            <span>Online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noChatSelected" style="flex: 1; text-align: center;">
+                    <h3>Select a contact to start chatting</h3>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages will be loaded here -->
+                <div class="no-chat-selected" id="emptyChatState">
+                    <i class="fas fa-comments"></i>
+                    <h2>Start a conversation</h2>
+                    <p>Select a contact from the sidebar to begin chatting</p>
+                </div>
+            </div>
+
+            <div class="input-container" id="messageInputContainer" style="display: none;">
+                <button class="emoji-btn" id="emojiBtn">
+                    <i class="far fa-smile"></i>
+                </button>
+                
+                <!-- Enhanced Emoji Picker -->
+                <div class="emoji-picker" id="emojiPicker">
+                    <div class="emoji-header">
+                        <h4>Emojis</h4>
+                        <button id="closeEmojiPicker" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #666;">×</button>
+                    </div>
+                    <div class="emoji-categories" id="emojiCategories">
+                        <!-- Categories will be populated by JavaScript -->
+                    </div>
+                    <div class="emoji-grid" id="emojiGrid">
+                        <!-- Emojis will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <textarea class="message-input" id="messageInput" placeholder="Type your message..."></textarea>
+                <button class="send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
+    
+    <!-- Custom Context Menu -->
+    <div id="customContextMenu" class="custom-context-menu">
+        <div class="context-menu-item" id="pasteMenuItem">
+            <i class="fas fa-paste"></i>
+            <span>Paste</span>
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="cancelMenuItem">
+            <i class="fas fa-times"></i>
+            <span>Cancel</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentChatUser = null;
+        let socket = null;
+        let contacts = {};
+        let typingTimeout = null;
+        let sentMessageIds = new Set(); // Track sent message IDs to prevent duplicates
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const contactList = document.getElementById('contactList');
+        const chatArea = document.getElementById('chatArea');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const emojiBtn = document.getElementById('emojiBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const emojiGrid = document.getElementById('emojiGrid');
+        const emojiCategories = document.getElementById('emojiCategories');
+        const chatContactInfo = document.getElementById('chatContactInfo');
+        const messageInputContainer = document.getElementById('messageInputContainer');
+        const emptyChatState = document.getElementById('emptyChatState');
+        const noChatSelected = document.getElementById('noChatSelected');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Emoji Data - Organized into categories
+        const emojiData = {
+            'faces': [
+                '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+                '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+                '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸'
+            ],
+            'hands': [
+                '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞',
+                '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '👍', '👎',
+                '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏'
+            ],
+            'hearts': [
+                '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔',
+                '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️'
+            ],
+            'flowers': [
+                '💐', '🌸', '💮', '🏵️', '🌹', '🥀', '🌺', '🌻', '🌼', '🌷',
+                '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃', '🍂', '🍁', '🍄'
+            ],
+            'animals': [
+                '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐻‍❄️', '🐨',
+                '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤'
+            ],
+            'food': [
+                '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈',
+                '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑', '🥦', '🥬'
+            ],
+            'objects': [
+                '📱', '💻', '⌨️', '🖥️', '🖨️', '📷', '🎥', '📽️', '🎞️', '📞',
+                '📟', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰'
+            ],
+            'symbols': [
+                '✨', '🌟', '💫', '⭐', '🔥', '💥', '☄️', '💦', '💨', '☁️',
+                '🌈', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️'
+            ]
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            initSocket();
+            loadContacts();
+            setupEventListeners();
+            initEmojiPicker();
+            // Ensure settings are applied after everything is loaded
+            setTimeout(applySavedSettings, 100);
+        });
+
+        function checkAuth() {
+            const userId = sessionStorage.getItem('user_id');
+            const username = sessionStorage.getItem('username');
+            const profilePhoto = sessionStorage.getItem('profile_photo') || 'default.jpg';
+
+            if (!userId || !username) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = {
+                id: userId,
+                username: username,
+                profile_photo: profilePhoto
+            };
+
+            document.getElementById('usernameDisplay').textContent = username;
+            document.getElementById('userProfilePhoto').src = profilePhoto === 'default.jpg' ? 'default.jpg' : `/uploads/${profilePhoto}`;
+            
+            // Apply saved settings
+            applySavedSettings();
+        }
+        
+        function applySavedSettings() {
+            // Apply saved text size
+            const savedTextSize = localStorage.getItem('dashboard_text_size');
+            if (savedTextSize) {
+                // Apply to ALL text elements in the dashboard
+                const allTextElements = document.querySelectorAll('body *');
+                allTextElements.forEach(element => {
+                    const computedStyle = window.getComputedStyle(element);
+                    const fontSize = computedStyle.fontSize;
+                    
+                    // Only apply to elements that have text content and are visible
+                    if (element.textContent && element.textContent.trim() !== '' && 
+                        computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden') {
+                        // Skip elements that are already set to avoid conflicts
+                        if (!element.style.fontSize || element.style.fontSize !== `${savedTextSize}px`) {
+                            element.style.fontSize = `${savedTextSize}px`;
+                        }
+                    }
+                });
+                
+                // Also apply to input elements
+                const inputElements = document.querySelectorAll('input, textarea');
+                inputElements.forEach(element => {
+                    element.style.fontSize = `${savedTextSize}px`;
+                });
+            }
+            
+            // Apply saved background
+            const savedBackground = localStorage.getItem('dashboard_background');
+            console.log('applySavedSettings called, saved background:', savedBackground);
+            
+            if (savedBackground) {
+                const body = document.body;
+                const dashboardContainer = document.querySelector('.dashboard-container');
+                
+                console.log('Applying background:', savedBackground);
+                console.log('Dashboard container found:', !!dashboardContainer);
+                
+                // Remove any existing custom backgrounds
+                body.style.background = '';
+                if (dashboardContainer) {
+                    dashboardContainer.style.background = '';
+                }
+                
+                // Apply background to body
+                switch(savedBackground) {
+                    case 'default':
+                        body.style.background = '#f0f2f5';
+                        break;
+                    case 'blue':
+                        body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                        console.log('Applied blue gradient to body');
+                        break;
+                    case 'green':
+                        body.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                        console.log('Applied green gradient to body');
+                        break;
+                    case 'purple':
+                        body.style.background = 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)';
+                        console.log('Applied purple gradient to body');
+                        break;
+                    case 'sunset':
+                        body.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)';
+                        console.log('Applied sunset gradient to body');
+                        break;
+                    default:
+                        body.style.background = '#f0f2f5';
+                }
+                
+                // Apply white background to container for contrast
+                if (dashboardContainer) {
+                    dashboardContainer.style.background = 'white';
+                    console.log('Applied white background to container');
+                }
+                
+                console.log('Background applied. Body background:', body.style.background);
+                if (dashboardContainer) {
+                    console.log('Container background:', dashboardContainer.style.background);
+                }
+            } else {
+                console.log('No saved background found in localStorage');
+            }
+        }
+
+        function initSocket() {
+            socket = io(window.location.origin);
+
+            socket.on('connect', () => {
+                console.log('Connected to WebSocket server');
+                
+                // Join user's personal room
+                socket.emit('join_user_room', { user_id: currentUser.id });
+                
+                // Notify server that user is online
+                socket.emit('user_online', { user_id: currentUser.id });
+                
+                // Update user status
+                document.getElementById('userStatus').textContent = 'Online';
+                const statusDot = document.querySelector('.user-status .status-dot');
+                if (statusDot) {
+                    statusDot.style.display = 'inline-block';
+                }
+            });
+
+            socket.on('connected', (data) => {
+                console.log('Socket connected:', data);
+            });
+
+            socket.on('new_message', (message) => {
+                console.log('New message received:', message);
+                
+                if (currentChatUser && message.sender_id == currentChatUser.id) {
+                    // Message from current chat user
+                    addMessageToChat(message, false);
+                    markMessageAsSeen(message.id);
+                    updateContactUnreadCount(currentChatUser.id, -1);
+                    
+                    // Play notification sound (optional)
+                    playNotificationSound();
+                } else {
+                    // Message from someone else
+                    updateContactUnreadCount(message.sender_id, 1);
+                    
+                    // Show desktop notification if not focused
+                    if (document.hidden) {
+                        showDesktopNotification(message.sender_name, message.message_text);
+                    }
+                }
+                
+                // Update contact list to reflect new message
+                updateContactLastMessage(message.sender_id, message.message_text);
+                loadContacts();
+            });
+
+            socket.on('new_message_self', (message) => {
+                console.log('New message self (for status update):', message);
+                // This handles messages sent by current user to update their own view
+                if (currentChatUser && message.receiver_id == currentChatUser.id) {
+                    // Update message status if needed
+                    updateMessageStatus(message.id, message.is_seen || false);
+                }
+            });
+
+            socket.on('message_sent', (message) => {
+                console.log('Message sent confirmation:', message);
+                // Remove the temporary message and add the real one
+                const tempMessage = document.querySelector(`[data-message-id^="temp_"]`);
+                if (tempMessage) {
+                    tempMessage.remove();
+                }
+                
+                // Check if we already displayed this message
+                if (!sentMessageIds.has(message.id)) {
+                    addMessageToChat(message, true);
+                    sentMessageIds.add(message.id);
+                }
+            });
+
+            socket.on('message_status', (data) => {
+                console.log('Message status update:', data);
+                updateMessageStatus(data.message_id, data.is_seen);
+            });
+
+            socket.on('user_status', (data) => {
+                console.log('User status update:', data);
+                updateUserStatus(data.user_id, data.is_online, data.last_seen);
+            });
+
+            socket.on('user_typing', (data) => {
+                if (currentChatUser && data.sender_id == currentChatUser.id) {
+                    showTypingIndicator(data.is_typing);
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected from WebSocket server');
+                document.getElementById('userStatus').textContent = 'Offline';
+                const statusDot = document.querySelector('.user-status .status-dot');
+                if (statusDot) {
+                    statusDot.style.display = 'none';
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Search input
+            searchInput.addEventListener('input', debounce(handleSearch, 300));
+
+            // Send message
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Typing indicator
+            messageInput.addEventListener('input', () => {
+                if (currentChatUser) {
+                    socket.emit('typing', {
+                        sender_id: currentUser.id,
+                        receiver_id: currentChatUser.id,
+                        is_typing: true
+                    });
+                    
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        socket.emit('typing', {
+                            sender_id: currentUser.id,
+                            receiver_id: currentChatUser.id,
+                            is_typing: false
+                        });
+                    }, 1000);
+                }
+            });
+
+            // Logout
+            document.querySelector('.settings-btn').addEventListener('click', (e) => {
+                if (e.target.closest('button')) {
+                    window.location.href = 'settings.html';
+                }
+            });
+
+            // Close emoji picker when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!emojiPicker.contains(e.target) && e.target !== emojiBtn && !emojiBtn.contains(e.target)) {
+                    emojiPicker.classList.remove('active');
+                }
+            });
+
+            // Close button for emoji picker
+            document.getElementById('closeEmojiPicker').addEventListener('click', () => {
+                emojiPicker.classList.remove('active');
+            });
+
+            // Prevent closing when clicking inside emoji picker
+            emojiPicker.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            // Custom context menu for message input (desktop right-click)
+            messageInput.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showCustomContextMenu(e.clientX, e.clientY);
+            });
+
+            // Long press detection for mobile (touch devices)
+            let touchStartTime = 0;
+            let touchTimer = null;
+            
+            messageInput.addEventListener('touchstart', function(e) {
+                touchStartTime = Date.now();
+                touchTimer = setTimeout(() => {
+                    // Long press detected (500ms)
+                    if (Date.now() - touchStartTime >= 500) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        showCustomContextMenu(touch.clientX, touch.clientY);
+                    }
+                }, 500);
+            });
+
+            messageInput.addEventListener('touchend', function(e) {
+                if (touchTimer) {
+                    clearTimeout(touchTimer);
+                    touchTimer = null;
+                }
+            });
+
+            messageInput.addEventListener('touchmove', function(e) {
+                if (touchTimer) {
+                    clearTimeout(touchTimer);
+                    touchTimer = null;
+                }
+            });
+
+            // Setup custom context menu event listeners
+            setupCustomContextMenu();
+
+            // Mobile keyboard handling
+            setupKeyboardHandling();
+        }
+
+        // Custom context menu functions
+        function showCustomContextMenu(x, y) {
+            const contextMenu = document.getElementById('customContextMenu');
+            
+            // Position the context menu
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            
+            // Adjust position if it goes off screen
+            const rect = contextMenu.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            if (rect.right > viewportWidth) {
+                contextMenu.style.left = (x - rect.width) + 'px';
+            }
+            
+            if (rect.bottom > viewportHeight) {
+                contextMenu.style.top = (y - rect.height) + 'px';
+            }
+            
+            // Show the context menu
+            contextMenu.style.display = 'block';
+            
+            // Close context menu when clicking outside
+            const closeContextMenu = (e) => {
+                if (!contextMenu.contains(e.target)) {
+                    contextMenu.style.display = 'none';
+                    document.removeEventListener('click', closeContextMenu);
+                }
+            };
+            
+            // Add event listener to close context menu
+            setTimeout(() => {
+                document.addEventListener('click', closeContextMenu);
+            }, 10);
+        }
+
+        function setupCustomContextMenu() {
+            const pasteMenuItem = document.getElementById('pasteMenuItem');
+            const cancelMenuItem = document.getElementById('cancelMenuItem');
+            const contextMenu = document.getElementById('customContextMenu');
+            
+            // Paste menu item click handler
+            pasteMenuItem.addEventListener('click', function() {
+                contextMenu.style.display = 'none';
+                pasteFromClipboard();
+            });
+            
+            // Cancel menu item click handler
+            cancelMenuItem.addEventListener('click', function() {
+                contextMenu.style.display = 'none';
+            });
+        }
+
+        function setupKeyboardHandling() {
+            // Only apply on mobile devices
+            if (!isMobileDevice()) return;
+
+            const inputContainer = document.getElementById('messageInputContainer');
+            const chatArea = document.querySelector('.chat-area');
+            const messageInput = document.getElementById('messageInput');
+            
+            if (!inputContainer || !chatArea || !messageInput) return;
+
+            let keyboardVisible = false;
+            let originalInputPosition = {};
+            
+            // Store original position
+            originalInputPosition = {
+                position: inputContainer.style.position || 'relative',
+                bottom: inputContainer.style.bottom || 'auto',
+                left: inputContainer.style.left || 'auto',
+                right: inputContainer.style.right || 'auto',
+                padding: inputContainer.style.padding || '20px',
+                background: inputContainer.style.background || 'white'
+            };
+
+            // Function to detect keyboard appearance
+            function detectKeyboard() {
+                // Check if viewport height changed significantly
+                const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const screenHeight = window.screen.height;
+                
+                // Keyboard is likely visible if viewport is less than 70% of screen height
+                const keyboardVisibleNow = viewportHeight < screenHeight * 0.7;
+                
+                if (keyboardVisibleNow !== keyboardVisible) {
+                    keyboardVisible = keyboardVisibleNow;
+                    toggleKeyboardMode(keyboardVisible);
+                }
+            }
+
+            function toggleKeyboardMode(visible) {
+                if (visible) {
+                    // Keyboard is visible - adjust layout
+                    inputContainer.classList.add('keyboard-visible');
+                    chatArea.classList.add('keyboard-visible');
+                    
+                    // Scroll to bottom to ensure input is visible
+                    setTimeout(() => {
+                        inputContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 100);
+                } else {
+                    // Keyboard is hidden - restore original layout
+                    inputContainer.classList.remove('keyboard-visible');
+                    chatArea.classList.remove('keyboard-visible');
+                    
+                    // Restore original styles
+                    inputContainer.style.position = originalInputPosition.position;
+                    inputContainer.style.bottom = originalInputPosition.bottom;
+                    inputContainer.style.left = originalInputPosition.left;
+                    inputContainer.style.right = originalInputPosition.right;
+                    inputContainer.style.padding = originalInputPosition.padding;
+                    inputContainer.style.background = originalInputPosition.background;
+                }
+            }
+
+            // Event listeners for keyboard detection
+            window.addEventListener('resize', detectKeyboard);
+            
+            // For newer browsers with visualViewport API
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', detectKeyboard);
+            }
+
+            // Focus/blur events as additional triggers
+            messageInput.addEventListener('focus', () => {
+                setTimeout(detectKeyboard, 300); // Allow time for keyboard to appear
+            });
+
+            messageInput.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (keyboardVisible) {
+                        toggleKeyboardMode(false);
+                    }
+                }, 200); // Allow time for keyboard to hide
+            });
+
+            // Initial detection
+            detectKeyboard();
+        }
+
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                // Try modern clipboard API first
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    insertTextAtCursor(text);
+                    showToast('success', 'Pasted', 'Text pasted successfully!');
+                }
+            } catch (err) {
+                console.error('Paste failed:', err);
+                // Fallback for older browsers or when permissions are denied
+                try {
+                    // Create a temporary textarea to capture paste
+                    const textArea = document.createElement('textarea');
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    textArea.style.top = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    
+                    // Wait a bit for paste to happen
+                    setTimeout(() => {
+                        const pastedText = textArea.value;
+                        document.body.removeChild(textArea);
+                        
+                        if (pastedText) {
+                            insertTextAtCursor(pastedText);
+                            showToast('success', 'Pasted', 'Text pasted successfully!');
+                        } else {
+                            showToast('error', 'Paste Failed', 'No text to paste or permission denied');
+                        }
+                    }, 100);
+                } catch (fallbackErr) {
+                    console.error('Fallback paste failed:', fallbackErr);
+                    showToast('error', 'Paste Failed', 'Unable to paste text');
+                }
+            }
+        }
+
+        function insertTextAtCursor(text) {
+            const input = messageInput;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            
+            // Insert text at cursor position
+            input.value = input.value.substring(0, start) + text + input.value.substring(end);
+            
+            // Move cursor to after inserted text
+            const newCursorPos = start + text.length;
+            input.selectionStart = input.selectionEnd = newCursorPos;
+            
+            // Focus back to input
+            input.focus();
+        }
+
+        async function deleteMessage(messageId) {
+            // Confirm deletion with user
+            if (!confirm('Are you sure you want to delete this message?')) {
+                return;
+            }
+            
+            // Check if currentUser is available
+            if (!currentUser || !currentUser.id) {
+                showToast('error', 'Delete Failed', 'User not authenticated');
+                return;
+            }
+            
+            try {
+                console.log('Attempting to delete message:', messageId, 'by user:', currentUser.id);
+                
+                // Send delete request to server
+                const response = await fetch('/delete_message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message_id: messageId,
+                        user_id: currentUser.id
+                    })
+                });
+                
+                console.log('Delete response status:', response.status);
+                const result = await response.json();
+                console.log('Delete response result:', result);
+                
+                if (result.success) {
+                    // Remove the message from the UI
+                    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.remove();
+                        showToast('success', 'Message Deleted', 'Message was successfully deleted!');
+                    }
+                } else {
+                    showToast('error', 'Delete Failed', result.message || 'Failed to delete message');
+                }
+            } catch (error) {
+                console.error('Delete message error:', error);
+                showToast('error', 'Delete Failed', 'Network error occurred while deleting message: ' + error.message);
+            }
+        }
+
+        function initEmojiPicker() {
+            // Create category buttons
+            const categories = Object.keys(emojiData);
+            emojiCategories.innerHTML = '';
+            
+            categories.forEach((category, index) => {
+                const button = document.createElement('button');
+                button.className = `emoji-category ${index === 0 ? 'active' : ''}`;
+                button.textContent = getCategoryEmoji(category);
+                button.title = category.charAt(0).toUpperCase() + category.slice(1);
+                button.dataset.category = category;
+                
+                button.addEventListener('click', () => {
+                    // Update active category
+                    document.querySelectorAll('.emoji-category').forEach(cat => cat.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Load emojis for this category
+                    loadEmojis(category);
+                });
+                
+                emojiCategories.appendChild(button);
+            });
+            
+            // Load first category's emojis
+            loadEmojis(categories[0]);
+            
+            // Setup emoji button click handler
+            emojiBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                emojiPicker.classList.toggle('active');
+            });
+        }
+
+        function loadEmojis(category) {
+            emojiGrid.innerHTML = '';
+            
+            if (emojiData[category]) {
+                emojiData[category].forEach(emoji => {
+                    const emojiElement = document.createElement('div');
+                    emojiElement.className = 'emoji-item';
+                    emojiElement.textContent = emoji;
+                    emojiElement.title = `Insert ${emoji}`;
+                    emojiElement.dataset.category = category;
+                    
+                    emojiElement.addEventListener('click', () => {
+                        insertEmoji(emoji);
+                    });
+                    
+                    emojiGrid.appendChild(emojiElement);
+                });
+            }
+        }
+
+        function getCategoryEmoji(category) {
+            const categoryEmojis = {
+                'faces': '😀',
+                'hands': '👋',
+                'hearts': '❤️',
+                'flowers': '🌸',
+                'animals': '🐶',
+                'food': '🍎',
+                'objects': '📱',
+                'symbols': '✨'
+            };
+            return categoryEmojis[category] || '❓';
+        }
+
+        function insertEmoji(emoji) {
+            const input = messageInput;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            
+            // Insert emoji at cursor position
+            input.value = input.value.substring(0, start) + emoji + input.value.substring(end);
+            
+            // Move cursor after inserted emoji
+            input.selectionStart = input.selectionEnd = start + emoji.length;
+            
+            // Focus back to input
+            input.focus();
+            
+            // Hide emoji picker after insertion
+            emojiPicker.classList.remove('active');
+        }
+
+        async function handleSearch() {
+            const query = searchInput.value.trim();
+            
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search_users?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.success && data.users.length > 0) {
+                    displaySearchResults(data.users);
+                } else {
+                    searchResults.innerHTML = '<div class="search-result-item">No users found</div>';
+                    searchResults.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        }
+
+        function displaySearchResults(users) {
+            searchResults.innerHTML = '';
+            
+            users.forEach(user => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <img src="/uploads/${user.profile_photo}" alt="${user.username}">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">${user.username}</div>
+                        <div style="font-size: 0.9rem; color: #666;">${user.phone}</div>
+                    </div>
+                    <div class="contact-status">
+                        ${user.is_online ? '<span class="online-dot"></span>' : ''}
+                        ${user.is_contact ? '<span style="color: #4cd964;"><i class="fas fa-check-circle"></i></span>' : 
+                          '<button class="add-contact-btn" style="background: #667eea; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Add</button>'}
+                    </div>
+                `;
+                
+                if (!user.is_contact) {
+                    const addBtn = resultItem.querySelector('.add-contact-btn');
+                    addBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        addContact(user.id);
+                    });
+                }
+                
+                resultItem.addEventListener('click', () => {
+                    if (user.is_contact) {
+                        selectChatUser(user);
+                        searchResults.style.display = 'none';
+                        searchInput.value = '';
+                    }
+                });
+                
+                searchResults.appendChild(resultItem);
+            });
+            
+            searchResults.style.display = 'block';
+        }
+
+        async function addContact(contactId) {
+            try {
+                const response = await fetch('/add_contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ contact_id: contactId })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Contact added successfully!');
+                    loadContacts();
+                    searchResults.style.display = 'none';
+                    searchInput.value = '';
+                } else {
+                    alert(data.message || 'Failed to add contact');
+                }
+            } catch (error) {
+                console.error('Add contact error:', error);
+                alert('Failed to add contact');
+            }
+        }
+
+        async function loadContacts() {
+            try {
+                const response = await fetch('/get_contacts');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayContacts(data.contacts);
+                }
+            } catch (error) {
+                console.error('Load contacts error:', error);
+            }
+        }
+
+        function displayContacts(contactsList) {
+            contactList.innerHTML = '';
+            
+            if (contactsList.length === 0) {
+                contactList.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;">No contacts yet</div>';
+                return;
+            }
+
+            contactsList.forEach(contact => {
+                contacts[contact.id] = contact;
+                
+                const contactItem = document.createElement('div');
+                contactItem.className = 'contact-item';
+                if (currentChatUser && currentChatUser.id === contact.id) {
+                    contactItem.classList.add('active');
+                }
+                
+                contactItem.innerHTML = `
+                    <img src="/uploads/${contact.profile_photo}" alt="${contact.username}" class="contact-photo">
+                    <div class="contact-info">
+                        <div class="contact-header">
+                            <div class="contact-name">${contact.username}</div>
+                            <div class="contact-time">${formatTime(contact.last_seen)}</div>
+                        </div>
+                        <div class="contact-message">
+                            <div class="contact-status">
+                                ${contact.is_online ? '<span class="online-dot"></span>' : ''}
+                                ${contact.is_online ? 'Online' : 'Offline'}
+                            </div>
+                        </div>
+                    </div>
+                    ${contact.unread_count > 0 ? `<div class="unread-badge">${contact.unread_count}</div>` : ''}
+                `;
+                
+                contactItem.addEventListener('click', () => {
+                    selectChatUser(contact);
+                });
+                
+                contactList.appendChild(contactItem);
+            });
+        }
+
+        function selectChatUser(user) {
+            currentChatUser = user;
+            
+            // Update UI
+            document.querySelectorAll('.contact-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.contact-item').forEach(item => {
+                if (item.querySelector('.contact-name').textContent === user.username) {
+                    item.classList.add('active');
+                    // Clear unread badge
+                    const badge = item.querySelector('.unread-badge');
+                    if (badge) badge.remove();
+                }
+            });
+            
+            // Show chat interface
+            chatContactInfo.style.display = 'flex';
+            noChatSelected.style.display = 'none';
+            messageInputContainer.style.display = 'flex';
+            emptyChatState.style.display = 'none';
+            
+            // Update chat header
+            document.getElementById('chatContactPhoto').src = `/uploads/${user.profile_photo}`;
+            document.getElementById('chatContactName').textContent = user.username;
+            
+            updateChatContactStatus(user);
+            
+            // Load messages
+            loadMessages(user.id);
+            
+            // Hide sidebar on mobile
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+            }
+            
+            // Focus message input
+            setTimeout(() => {
+                messageInput.focus();
+            }, 100);
+        }
+
+        function updateChatContactStatus(user) {
+            const statusElement = document.getElementById('chatContactStatus');
+            if (user.is_online) {
+                statusElement.innerHTML = '<span class="status-dot"></span> <span>Online</span>';
+            } else {
+                statusElement.innerHTML = '<span>Last seen ' + formatTime(user.last_seen) + '</span>';
+            }
+        }
+
+        async function loadMessages(otherUserId) {
+            try {
+                const response = await fetch(`/get_messages?user_id=${otherUserId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayMessages(data.messages);
+                }
+            } catch (error) {
+                console.error('Load messages error:', error);
+            }
+        }
+
+        function displayMessages(messages) {
+            messagesContainer.innerHTML = '';
+            sentMessageIds.clear(); // Clear sent message IDs when loading new chat
+            
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        <i class="fas fa-comment-slash" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>No messages yet</h3>
+                        <p>Start the conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(message => {
+                addMessageToChat(message, message.sender_id == currentUser.id);
+            });
+
+            // Scroll to bottom
+            scrollToBottom();
+        }
+
+        function addMessageToChat(message, isSent) {
+            // Check if we already displayed this message
+            if (sentMessageIds.has(message.id)) {
+                return;
+            }
+            
+            sentMessageIds.add(message.id);
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+            messageElement.dataset.messageId = message.id;
+            
+            // Format time
+            const time = new Date(message.sent_at);
+            const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Process message text to make emojis larger and handle replies
+            const processedText = processMessageText(message.message_text);
+            
+            messageElement.innerHTML = `
+                <div class="message-actions">
+                    <button class="message-action-btn" onclick="copyMessage('${message.id}')" title="Copy message">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="message-action-btn" onclick="replyToMessage('${message.id}')" title="Reply to message">
+                        <i class="fas fa-reply"></i>
+                    </button>
+                    <button class="message-action-btn" onclick="deleteMessage('${message.id}')" title="Delete message">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="message-text">${processedText}</div>
+                <div class="message-time">
+                    ${timeString}
+                    ${isSent ? `<span class="message-status">${message.is_seen ? '✓✓' : '✓'}</span>` : ''}
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function processMessageText(text) {
+            // Escape HTML first
+            text = escapeHtml(text);
+            
+            // Check for professional reply format
+            const replySeparator = '────────── REPLY ──────────';
+            if (text.includes(replySeparator)) {
+                const parts = text.split(replySeparator);
+                if (parts.length > 1) {
+                    const mainMessage = parts[0].trim();
+                    let replyContent = parts[1].trim();
+                    
+                    // Extract sender info if present
+                    let senderName = '';
+                    const senderMatch = replyContent.match(/^From: ([^:]+):/);
+                    if (senderMatch) {
+                        senderName = senderMatch[1];
+                        replyContent = replyContent.substring(senderMatch[0].length).trim();
+                    }
+                    
+                    // Process emojis in both parts
+                    const emojiRegex = /[\p{Emoji_Presentation}\p{Emoji}️]/gu;
+                    
+                    // Process main message emojis
+                    let processedMain = mainMessage;
+                    if (mainMessage.match(emojiRegex)) {
+                        processedMain = mainMessage.replace(emojiRegex, (match) => {
+                            return `<span class="emoji">${match}</span>`;
+                        });
+                    }
+                    
+                    // Process reply content emojis
+                    let processedReply = replyContent;
+                    if (replyContent.match(emojiRegex)) {
+                        processedReply = replyContent.replace(emojiRegex, (match) => {
+                            return `<span class="emoji">${match}</span>`;
+                        });
+                    }
+                    
+                    // Return professional reply format
+                    return `
+                        <div class="main-reply">${processedMain}</div>
+                        <div class="reply-separator">
+                            <div class="reply-separator-text">Reply</div>
+                        </div>
+                        <div class="reply-container">
+                            ${senderName ? `<div class="reply-label"><i class="fas fa-reply"></i> Replying to <span class="reply-sender">${senderName}</span></div>` : ''}
+                            <div class="reply-content">${processedReply}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Check for legacy reply format (backward compatibility)
+            const legacySeparator = '────────────────────────────────';
+            if (text.includes(legacySeparator)) {
+                const parts = text.split(legacySeparator);
+                if (parts.length > 1) {
+                    const mainMessage = parts[0].trim();
+                    let replyContent = parts[1].trim();
+                    
+                    // Extract sender info if present
+                    let senderName = '';
+                    const senderMatch = replyContent.match(/^Replying to ([^:]+):/);
+                    if (senderMatch) {
+                        senderName = senderMatch[1];
+                        replyContent = replyContent.substring(senderMatch[0].length).trim();
+                    }
+                    
+                    // Process emojis
+                    const emojiRegex = /[\p{Emoji_Presentation}\p{Emoji}️]/gu;
+                    
+                    let processedMain = mainMessage;
+                    if (mainMessage.match(emojiRegex)) {
+                        processedMain = mainMessage.replace(emojiRegex, (match) => {
+                            return `<span class="emoji">${match}</span>`;
+                        });
+                    }
+                    
+                    let processedReply = replyContent;
+                    if (replyContent.match(emojiRegex)) {
+                        processedReply = replyContent.replace(emojiRegex, (match) => {
+                            return `<span class="emoji">${match}</span>`;
+                        });
+                    }
+                    
+                    return `
+                        <div class="main-reply">${processedMain}</div>
+                        <div class="reply-separator">
+                            <div class="reply-separator-text">Reply</div>
+                        </div>
+                        <div class="reply-container">
+                            ${senderName ? `<div class="reply-label"><i class="fas fa-reply"></i> Replying to <span class="reply-sender">${senderName}</span></div>` : ''}
+                            <div class="reply-content">${processedReply}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Check if the message contains emojis (for non-reply messages)
+            const emojiRegex = /[\p{Emoji_Presentation}\p{Emoji}️]/gu;
+            const emojis = text.match(emojiRegex);
+                    
+            if (emojis) {
+                // Replace each emoji with a span that has the emoji class
+                text = text.replace(emojiRegex, (match) => {
+                    return `<span class="emoji">${match}</span>`;
+                });
+            }
+                    
+            return text;
+        }
+
+        function copyMessage(messageId) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"] .message-text`);
+            if (messageElement) {
+                // Get clean text without HTML tags for copying
+                const text = messageElement.textContent || messageElement.innerText;
+                
+                // Use modern clipboard API
+                navigator.clipboard.writeText(text).then(() => {
+                    // Show success toast notification
+                    showToast('success', 'Message Copied', 'Message copied to clipboard successfully!');
+                }).catch(err => {
+                    console.error('Copy failed:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast('success', 'Message Copied', 'Message copied to clipboard successfully!');
+                    } catch (e) {
+                        showToast('error', 'Copy Failed', 'Failed to copy message. Please try again.');
+                    }
+                    document.body.removeChild(textArea);
+                });
+            }
+        }
+
+        function replyToMessage(messageId) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                // Get the message text
+                const messageTextElement = messageElement.querySelector('.message-text');
+                const messageText = messageTextElement ? messageTextElement.textContent || messageTextElement.innerText : '';
+                
+                // Get the sender's name
+                const isSent = messageElement.classList.contains('sent');
+                let senderName = '';
+                
+                if (!isSent && currentChatUser) {
+                    senderName = currentChatUser.username;
+                } else if (isSent) {
+                    senderName = currentUser.username;
+                }
+                
+                // Create professional reply format
+                const replySeparator = '────────── REPLY ──────────';
+                const replyHeader = senderName ? `From: ${senderName}:\n` : '';
+                const formattedReply = `${replyHeader}${messageText}`;
+                
+                // Focus the message input and add the formatted reply
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) {
+                    // If there's already text, add proper separation
+                    const existingText = messageInput.value.trim();
+                    
+                    // Create the full reply format
+                    const fullText = existingText 
+                        ? `${existingText}\n${replySeparator}\n${formattedReply}\n` 
+                        : `\n${replySeparator}\n${formattedReply}\n`;
+                    
+                    messageInput.value = fullText;
+                    messageInput.focus();
+                    
+                    // Move cursor to the beginning for new message composition
+                    const cursorPos = fullText.indexOf(replySeparator) + replySeparator.length + 1;
+                    messageInput.setSelectionRange(cursorPos, cursorPos);
+                    
+                    // Show success notification
+                    showToast('success', 'Reply Started', 'Reply format applied. Type your response below the separator.');
+                }
+            }
+        }
+
+        function showToast(type, title, message) {
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = 'toast-notification';
+            
+            // Set icon based on type
+            let icon = '✓';
+            if (type === 'error') {
+                icon = '✗';
+                toast.style.background = 'linear-gradient(135deg, #ff4757 0%, #ff6b81 100%)';
+            } else if (type === 'warning') {
+                icon = '⚠';
+                toast.style.background = 'linear-gradient(135deg, #ffa502 0%, #ffb142 100%)';
+            }
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <div class="toast-progress"></div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast with animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 400);
+            }, 3000);
+        }
+
+        function showTypingIndicator(show) {
+            let typingIndicator = document.querySelector('.typing-indicator');
+            
+            if (show) {
+                if (!typingIndicator) {
+                    typingIndicator = document.createElement('div');
+                    typingIndicator.className = 'typing-indicator';
+                    typingIndicator.innerHTML = `
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    `;
+                    messagesContainer.appendChild(typingIndicator);
+                }
+                typingIndicator.style.display = 'inline-flex';
+            } else if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+            }
+            
+            scrollToBottom();
+        }
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            
+            if (!text || !currentChatUser) {
+                return;
+            }
+
+            // Clear input immediately
+            messageInput.value = '';
+
+            // Send via WebSocket
+            socket.emit('send_message', {
+                sender_id: currentUser.id,
+                receiver_id: currentChatUser.id,
+                message_text: text
+            });
+
+            // DO NOT create a temporary message here
+            // Wait for the server to respond with the actual message
+            // This prevents duplicates
+        }
+
+        function markMessageAsSeen(messageId) {
+            socket.emit('message_seen', {
+                message_id: messageId,
+                user_id: currentUser.id
+            });
+        }
+
+        function updateMessageStatus(messageId, isSeen) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                const statusElement = messageElement.querySelector('.message-status');
+                if (statusElement) {
+                    statusElement.textContent = isSeen ? '✓✓' : '✓';
+                }
+            }
+        }
+
+        function updateUserStatus(userId, isOnline, lastSeen) {
+            if (contacts[userId]) {
+                contacts[userId].is_online = isOnline;
+                if (lastSeen) {
+                    contacts[userId].last_seen = lastSeen;
+                }
+                
+                // Update in contact list
+                const contactItem = document.querySelector(`.contact-item img[src*="${contacts[userId].profile_photo}"]`)?.closest('.contact-item');
+                if (contactItem) {
+                    const statusElement = contactItem.querySelector('.contact-status');
+                    if (statusElement) {
+                        if (isOnline) {
+                            statusElement.innerHTML = '<span class="online-dot"></span> Online';
+                        } else {
+                            const lastSeenTime = lastSeen || contacts[userId].last_seen;
+                            statusElement.innerHTML = 'Last seen ' + formatTime(lastSeenTime);
+                        }
+                    }
+                }
+                
+                // Update in chat header if current chat
+                if (currentChatUser && currentChatUser.id === userId) {
+                    const statusElement = document.getElementById('chatContactStatus');
+                    if (isOnline) {
+                        statusElement.innerHTML = '<span class="status-dot"></span> <span>Online</span>';
+                    } else {
+                        const lastSeenTime = lastSeen || contacts[userId].last_seen;
+                        statusElement.innerHTML = '<span>Last seen ' + formatTime(lastSeenTime) + '</span>';
+                    }
+                }
+            }
+        }
+
+        function updateContactLastMessage(contactId, messageText) {
+            if (contacts[contactId]) {
+                contacts[contactId].last_message = messageText;
+            }
+        }
+
+        function updateContactUnreadCount(contactId, change) {
+            if (contacts[contactId]) {
+                contacts[contactId].unread_count = (contacts[contactId].unread_count || 0) + change;
+                if (contacts[contactId].unread_count < 0) contacts[contactId].unread_count = 0;
+                
+                // Update in contact list
+                const contactItem = document.querySelector(`.contact-item img[src*="${contacts[contactId].profile_photo}"]`)?.closest('.contact-item');
+                if (contactItem) {
+                    let badge = contactItem.querySelector('.unread-badge');
+                    
+                    if (contacts[contactId].unread_count > 0) {
+                        if (!badge) {
+                            badge = document.createElement('div');
+                            badge.className = 'unread-badge';
+                            contactItem.appendChild(badge);
+                        }
+                        badge.textContent = contacts[contactId].unread_count;
+                    } else if (badge) {
+                        badge.remove();
+                    }
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        function scrollToBottom() {
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 100);
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return 'unknown';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function playNotificationSound() {
+            // Simple notification sound
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ');
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+            } catch (e) {}
+        }
+
+        function showDesktopNotification(title, body) {
+            if (!("Notification" in window)) return;
+            
+            if (Notification.permission === "granted") {
+                new Notification(title, { body, icon: '/default.jpg' });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification(title, { body, icon: '/default.jpg' });
+                    }
+                });
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Listen for direct messages from settings page
+        window.addEventListener('message', function(event) {
+            // Only accept messages from the same origin
+            if (event.origin !== window.location.origin) return;
+            
+            if (event.data && event.data.type === 'update_settings') {
+                console.log('Received direct message from settings:', event.data);
+                
+                if (event.data.background) {
+                    localStorage.setItem('dashboard_background', event.data.background);
+                    console.log('Updated background from direct message:', event.data.background);
+                }
+                if (event.data.textSize) {
+                    localStorage.setItem('dashboard_text_size', event.data.textSize);
+                    console.log('Updated text size from direct message:', event.data.textSize);
+                }
+                
+                console.log('Calling applySavedSettings from direct message...');
+                applySavedSettings();
+            }
+        });
+        
+        // Listen for localStorage changes from settings page to update settings in real-time
+        window.addEventListener('storage', function(event) {
+            console.log('Storage event detected:', event.key, event.newValue);
+            if (event.key === 'dashboard_update_trigger') {
+                console.log('Trigger event received, updating settings...');
+                // Read the temporary values
+                const tempTextSize = localStorage.getItem('dashboard_text_size_temp');
+                const tempBackground = localStorage.getItem('dashboard_background_temp');
+                
+                console.log('Temporary values - Text:', tempTextSize, 'Background:', tempBackground);
+                
+                if (tempTextSize) {
+                    localStorage.setItem('dashboard_text_size', tempTextSize);
+                    console.log('Updated text size to:', tempTextSize);
+                }
+                if (tempBackground) {
+                    localStorage.setItem('dashboard_background', tempBackground);
+                    console.log('Updated background to:', tempBackground);
+                }
+                
+                console.log('Calling applySavedSettings...');
+                applySavedSettings();
+            }
+        });
+        
+        // Also check for changes when page becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                console.log('Page became visible, checking for updates...');
+                // Check if there are pending updates
+                const pendingUpdate = localStorage.getItem('dashboard_update_trigger');
+                if (pendingUpdate) {
+                    console.log('Found pending update, applying...');
+                    applySavedSettings();
+                }
+            }
+        });
+        
+        // Request notification permission on page load
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+        
+        // Handle page visibility
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && currentChatUser) {
+                // Mark all messages as seen when user comes back to the page
+                if (currentChatUser.unread_count > 0) {
+                    updateContactUnreadCount(currentChatUser.id, -currentChatUser.unread_count);
+                }
+            }
+            
+            // Reapply settings when returning to the page
+            if (!document.hidden) {
+                setTimeout(applySavedSettings, 100);
+            }
+        });
+        
+        // Reapply settings when window gains focus (e.g. returning from settings)
+        window.addEventListener('focus', () => {
+            setTimeout(applySavedSettings, 100);
+        });
+    </script>
+</body>
+</html>

@@ -11,4 +11,6 @@ Pillow
 gunicorn
 gevent
 gevent-websocket
+
 greenlet
+eventlet>=0.35.2

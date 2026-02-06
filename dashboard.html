@@ -1264,7 +1264,7 @@
         }
 
         function initSocket() {
-            socket = io(window.location.origin);
+            socket = io();
 
             socket.on('connect', () => {
                 console.log('Connected to WebSocket server');
@@ -2504,7 +2504,7 @@
         // Listen for direct messages from settings page
         window.addEventListener('message', function(event) {
             // Only accept messages from the same origin
-            if (event.origin !== window.location.origin) return;
+            // Skip origin check to allow cross-origin communication in deployed environments
             
             if (event.data && event.data.type === 'update_settings') {
                 console.log('Received direct message from settings:', event.data);

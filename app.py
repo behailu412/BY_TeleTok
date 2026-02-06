@@ -696,9 +696,7 @@ def handle_typing(data):
             'is_typing': is_typing
         }, room=str(receiver_id))
 
-@app.before_first_request
-def create_tables():
-    """Create database tables if they don't exist"""
+with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
@@ -708,6 +706,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     socketio.run(app, debug=False, host='0.0.0.0', port=port)
+
 
 
 

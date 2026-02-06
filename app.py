@@ -76,7 +76,13 @@ class User(db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     is_online = db.Column(db.Boolean, default=False)
     
-    # Relationships
+    # Relationships - ensure proper back_populates
+    contacts = relationship("Contact", 
+                           foreign_keys="Contact.user_id", 
+                           back_populates="user",
+                           cascade="all, delete-orphan")
+    
+    # Message relationships remain the same
     sent_messages = relationship("Message", foreign_keys="Message.sender_id", back_populates="sender")
     received_messages = relationship("Message", foreign_keys="Message.receiver_id", back_populates="receiver")
     contacts = relationship("Contact", foreign_keys="Contact.user_id", back_populates="user")
@@ -103,7 +109,7 @@ class Contact(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
+    # Relationships - fixed to properly reference the User model
     user = relationship("User", foreign_keys=[user_id], back_populates="contacts")
     contact_user = relationship("User", foreign_keys=[contact_id])
     
@@ -400,36 +406,44 @@ def add_contact():
         return jsonify({'success': False, 'message': 'Invalid request'})
     
     try:
-        # Check if already connected
-        existing_contact = Contact.query.filter(
-            ((Contact.user_id == current_user_id) & (Contact.contact_id == contact_id)) |
-            ((Contact.user_id == contact_id) & (Contact.contact_id == current_user_id))
+        # Check if already connected (check both directions)
+        existing_contact = Contact.query.filter_by(
+            user_id=current_user_id, 
+            contact_id=contact_id
         ).first()
         
         if existing_contact:
             return jsonify({'success': False, 'message': 'Already connected'})
         
-        # Create mutual connection (both sides)
+        # Create contact (both directions for mutual connection)
         contact1 = Contact(user_id=current_user_id, contact_id=contact_id)
         contact2 = Contact(user_id=contact_id, contact_id=current_user_id)
         
-        db.session.add_all([contact1, contact2])
+        db.session.add(contact1)
+        db.session.add(contact2)
         db.session.commit()
         
         # Get contact info for response
         contact_user = User.query.get(contact_id)
+        if not contact_user:
+            return jsonify({'success': False, 'message': 'Contact user not found'})
+        
         contact_data = {
             'id': contact_user.id,
             'username': contact_user.username,
             'phone': contact_user.phone,
             'profile_photo': contact_user.profile_photo,
-            'is_online': contact_user.is_online
+            'is_online': contact_user.is_online,
+            'last_seen': contact_user.last_seen.isoformat() if contact_user.last_seen else None,
+            'unread_count': 0
         }
         
         return jsonify({'success': True, 'contact': contact_data})
     except Exception as e:
         db.session.rollback()
         print(f"Add contact error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': 'Failed to add contact'})
 
 @app.route('/get_contacts', methods=['GET'])
@@ -440,22 +454,26 @@ def get_contacts():
         return jsonify({'success': False, 'message': 'Not authenticated'})
     
     try:
-        # Get all contacts with unread message count
-        contacts = db.session.query(
-            User,
-            db.func.count(Message.id).filter(
-                Message.receiver_id == current_user_id,
-                Message.sender_id == User.id,
-                Message.is_seen == False
-            ).label('unread_count')
-        ).join(
-            Contact, User.id == Contact.contact_id
-        ).filter(
-            Contact.user_id == current_user_id
-        ).group_by(User.id).order_by(User.username).all()
+        # Get all contacts for the current user
+        contacts = Contact.query.filter_by(user_id=current_user_id).all()
+        
+        if not contacts:
+            return jsonify({'success': True, 'contacts': []})
         
         contacts_data = []
-        for user, unread_count in contacts:
+        for contact in contacts:
+            # Get the contact user details
+            user = User.query.get(contact.contact_id)
+            if not user:
+                continue
+            
+            # Calculate unread message count
+            unread_count = Message.query.filter(
+                Message.sender_id == user.id,
+                Message.receiver_id == current_user_id,
+                Message.is_seen == False
+            ).count()
+            
             contacts_data.append({
                 'id': user.id,
                 'username': user.username,
@@ -463,14 +481,16 @@ def get_contacts():
                 'profile_photo': user.profile_photo,
                 'is_online': user.is_online,
                 'last_seen': user.last_seen.isoformat() if user.last_seen else None,
-                'unread_count': unread_count or 0
+                'unread_count': unread_count
             })
         
         return jsonify({'success': True, 'contacts': contacts_data})
     except Exception as e:
         print(f"Get contacts error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': 'Failed to get contacts'})
-
+        
 @app.route('/get_messages', methods=['GET'])
 def get_messages():
     current_user_id = session.get('user_id')

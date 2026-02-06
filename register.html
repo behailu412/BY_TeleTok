@@ -598,7 +598,7 @@
             
             try {
                 // Send registration request
-                const response = await fetch('${window.location.origin}/register', {
+                const response = await fetch('/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -21,18 +21,34 @@ app.config['SECRET_KEY'] = 'teletok-secret-key-2024'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Aiven MySQL Database Configuration with SSL
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://avnadmin:AVNS_2KHrBK5j1HOPu4hc21y@mysql-d0f4f89-yifrubehailu02-c524.l.aivencloud.com:10271/defaultdb')
+# Database Configuration
+# First try DATABASE_URL from environment (Railway/Aiven)
+database_url = os.environ.get('DATABASE_URL')
+
+# Handle different database URL formats
+if database_url:
+    # For Railway-style URLs that start with postgresql:// or mysql://
+    if database_url.startswith('postgres://'):
+        # Convert to psycopg2 format
+        database_url = database_url.replace('postgres://', 'postgresql+psycopg2://', 1)
+    elif database_url.startswith('mysql://'):
+        # Ensure PyMySQL driver is used
+        database_url = database_url.replace('mysql://', 'mysql+pymysql://', 1)
+    elif database_url.startswith('postgresql://'):
+        # Convert to psycopg2 format
+        database_url = database_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
+else:
+    # Fallback to Aiven configuration
+    database_url = 'mysql+pymysql://avnadmin:AVNS_2KHrBK5j1HOPu4hc21y@mysql-d0f4f89-yifrubehailu02-c524.l.aivencloud.com:10271/defaultdb'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_recycle': 280,
     'pool_pre_ping': True,
     'connect_args': {
-        'ssl': {
-            'check_hostname': False,
-            'ssl_mode': 'REQUIRED'
-            # 'ca' መስመሩን እናጥፋዋለን ምክንያቱም ለጊዜው ችግር እየፈጠረ ስለሆነ
-        }
+        'charset': 'utf8mb4',
+        # Only use SSL if required by the hosting platform
     }
 }
 
@@ -44,7 +60,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize extensions
 db = SQLAlchemy(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading', logger=True, engineio_logger=True)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet', logger=True, engineio_logger=True)
 CORS(app)
 
 # Database Models
@@ -97,6 +113,26 @@ class Contact(db.Model):
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint to verify app and database connectivity"""
+    try:
+        with app.app_context():
+            from sqlalchemy import text
+            result = db.session.execute(text("SELECT 1"))
+        return jsonify({
+            'status': 'healthy',
+            'database': 'connected',
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'database': 'disconnected',
+            'error': str(e),
+            'timestamp': datetime.utcnow().isoformat()
+        }), 500
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -127,13 +163,17 @@ def serve_settings():
 # API Routes
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json
-    username = data.get('username')
-    phone = data.get('phone')
-    password = data.get('password')
-    
-    if not username or not phone or not password:
-        return jsonify({'success': False, 'message': 'All fields are required'})
+    try:
+        data = request.json
+        username = data.get('username')
+        phone = data.get('phone')
+        password = data.get('password')
+        
+        if not username or not phone or not password:
+            return jsonify({'success': False, 'message': 'All fields are required'})
+    except Exception as e:
+        print(f"Error processing registration request: {e}")
+        return jsonify({'success': False, 'message': 'Invalid request format'})
     
     # Validate Ethiopian phone format
     import re
@@ -149,12 +189,22 @@ def register():
         return jsonify({'success': False, 'message': 'Invalid Ethiopian phone number format'})
     
     # Check if phone already exists
-    existing_user = User.query.filter_by(phone=phone).first()
+    try:
+        existing_user = User.query.filter_by(phone=phone).first()
+    except Exception as e:
+        print(f"Database query error (phone check): {e}")
+        return jsonify({'success': False, 'message': 'Database error occurred'})
+    
     if existing_user:
         return jsonify({'success': False, 'message': 'Phone number already registered'})
     
     # Check username
-    existing_username = User.query.filter_by(username=username).first()
+    try:
+        existing_username = User.query.filter_by(username=username).first()
+    except Exception as e:
+        print(f"Database query error (username check): {e}")
+        return jsonify({'success': False, 'message': 'Database error occurred'})
+    
     if existing_username:
         return jsonify({'success': False, 'message': 'Username already taken'})
     
@@ -167,8 +217,13 @@ def register():
             password_hash=hashed_password,
             profile_photo='default.jpg'
         )
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Database commit error: {e}")
+            return jsonify({'success': False, 'message': 'Registration failed due to database error'})
         
         # Create session
         session['user_id'] = new_user.id
@@ -191,23 +246,36 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    phone = data.get('phone')
-    password = data.get('password')
-    
-    if not phone or not password:
-        return jsonify({'success': False, 'message': 'Phone and password are required'})
+    try:
+        data = request.json
+        phone = data.get('phone')
+        password = data.get('password')
+        
+        if not phone or not password:
+            return jsonify({'success': False, 'message': 'Phone and password are required'})
+    except Exception as e:
+        print(f"Error processing login request: {e}")
+        return jsonify({'success': False, 'message': 'Invalid request format'})
     
     hashed_password = hash_password(password)
     
     try:
-        user = User.query.filter_by(phone=phone, password_hash=hashed_password).first()
+        try:
+            user = User.query.filter_by(phone=phone, password_hash=hashed_password).first()
+        except Exception as db_error:
+            print(f"Database query error (login): {db_error}")
+            return jsonify({'success': False, 'message': 'Database error occurred'})
         
         if user:
             # Update last seen and online status
             user.last_seen = datetime.utcnow()
             user.is_online = True
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"Database commit error in login: {e}")
+                return jsonify({'success': False, 'message': 'Login failed due to database error'})
             
             session['user_id'] = user.id
             session['username'] = user.username
@@ -236,7 +304,11 @@ def logout():
             if user:
                 user.is_online = False
                 user.last_seen = datetime.utcnow()
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"Database commit error in logout: {e}")
                 
                 # Remove from online users
                 if user_id in online_users:
@@ -250,7 +322,7 @@ def logout():
                     })
         except Exception as e:
             print(f"Logout error: {e}")
-    
+
     session.clear()
     return jsonify({'success': True, 'message': 'Logged out successfully'})
 
@@ -700,11 +772,23 @@ def handle_typing(data):
         }, room=str(receiver_id))
 
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print(f"Error creating database tables: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            print("Database tables created successfully!")
+        except Exception as e:
+            print(f"Error creating database tables: {e}")
+            import traceback
+            traceback.print_exc()
     # Use PORT environment variable for Render.com
     port = int(os.environ.get('PORT', 5000))
 

@@ -1890,58 +1890,78 @@
         }
 
         async function loadContacts() {
-            try {
-                const response = await fetch('/get_contacts');
-                const data = await response.json();
+                try {
+                    const response = await fetch('/get_contacts');
+                    const data = await response.json();
 
-                if (data.success) {
-                    displayContacts(data.contacts);
+                    if (data.success) {
+                        displayContacts(data.contacts);
+                    } else {
+                        console.error('Failed to load contacts:', data.message);
+                        displayContacts([]);
+                    }
+                } catch (error) {
+                    console.error('Load contacts error:', error);
+                    displayContacts([]);
                 }
-            } catch (error) {
-                console.error('Load contacts error:', error);
             }
-        }
 
         function displayContacts(contactsList) {
-            contactList.innerHTML = '';
-            
-            if (contactsList.length === 0) {
-                contactList.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;">No contacts yet</div>';
-                return;
-            }
+        const contactList = document.getElementById('contactList');
+        contactList.innerHTML = '';
+        
+        // Remove the spinner if it exists
+        const spinner = document.getElementById('contactsSpinner');
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
+        
+        if (!contactsList || contactsList.length === 0) {
+            contactList.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #888;">
+                    <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h3>No contacts yet</h3>
+                    <p>Search for users to add as contacts</p>
+                </div>
+            `;
+            return;
+        }
 
-            contactsList.forEach(contact => {
-                contacts[contact.id] = contact;
-                
-                const contactItem = document.createElement('div');
-                contactItem.className = 'contact-item';
-                if (currentChatUser && currentChatUser.id === contact.id) {
-                    contactItem.classList.add('active');
-                }
-                
-                contactItem.innerHTML = `
-                    <img src="/uploads/${contact.profile_photo}" alt="${contact.username}" class="contact-photo">
-                    <div class="contact-info">
-                        <div class="contact-header">
-                            <div class="contact-name">${contact.username}</div>
-                            <div class="contact-time">${formatTime(contact.last_seen)}</div>
-                        </div>
-                        <div class="contact-message">
-                            <div class="contact-status">
-                                ${contact.is_online ? '<span class="online-dot"></span>' : ''}
-                                ${contact.is_online ? 'Online' : 'Offline'}
-                            </div>
+        contactsList.forEach(contact => {
+            contacts[contact.id] = contact;
+            
+            const contactItem = document.createElement('div');
+            contactItem.className = 'contact-item';
+            if (currentChatUser && currentChatUser.id === contact.id) {
+                contactItem.classList.add('active');
+            }
+            
+            contactItem.innerHTML = `
+                <img src="${contact.profile_photo === 'default.jpg' ? 'default.jpg' : '/uploads/' + contact.profile_photo}" 
+                    alt="${contact.username}" 
+                    class="contact-photo"
+                    onerror="this.src='default.jpg'">
+                <div class="contact-info">
+                    <div class="contact-header">
+                        <div class="contact-name">${contact.username}</div>
+                        <div class="contact-time">${formatTime(contact.last_seen)}</div>
+                    </div>
+                    <div class="contact-message">
+                        <div class="contact-status">
+                            ${contact.is_online ? '<span class="online-dot"></span>' : ''}
+                            ${contact.is_online ? 'Online' : 'Offline'}
                         </div>
                     </div>
-                    ${contact.unread_count > 0 ? `<div class="unread-badge">${contact.unread_count}</div>` : ''}
-                `;
-                
-                contactItem.addEventListener('click', () => {
-                    selectChatUser(contact);
-                });
-                
-                contactList.appendChild(contactItem);
+                </div>
+                ${contact.unread_count > 0 ? `<div class="unread-badge">${contact.unread_count}</div>` : ''}
+            `;
+            
+            contactItem.addEventListener('click', () => {
+                selectChatUser(contact);
             });
+            
+            contactList.appendChild(contactItem);
+        });
         }
 
         function selectChatUser(user) {

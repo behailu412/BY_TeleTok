@@ -988,14 +988,14 @@
                 window.postMessage({
                     type: 'update_settings',
                     background: bgValue
-                }, window.location.origin);
+                }, '*');
                 
                 // If dashboard is open in another tab via opener, trigger update
                 if (window.opener && !window.opener.closed) {
                     window.opener.postMessage({
                         type: 'update_settings',
                         background: bgValue
-                    }, window.location.origin);
+                    }, '*');
                 }
                 
                 // Show immediate preview
@@ -1060,7 +1060,7 @@
                 type: 'update_settings',
                 background: bgValue,
                 textSize: textSize
-            }, window.location.origin);
+            }, '*');
             
             // Trigger update on dashboard
             localStorage.setItem('dashboard_text_size_temp', textSize);

@@ -29,9 +29,12 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
     'connect_args': {
         'ssl': {
-            'ca': '/etc/ssl/certs/ca-certificates.crt' # ይህ በ Render ላይ ይሰራል
-        }  
-} }
+            'check_hostname': False,
+            'ssl_mode': 'REQUIRED'
+            # 'ca' መስመሩን እናጥፋዋለን ምክንያቱም ለጊዜው ችግር እየፈጠረ ስለሆነ
+        }
+    }
+}
 
 # Allowed file extensions for profile photos
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -706,6 +709,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     socketio.run(app, debug=False, host='0.0.0.0', port=port)
+
 
 
 

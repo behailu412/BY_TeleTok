@@ -1,9 +1,15 @@
+import eventlet
+eventlet.monkey_patch()
+
+import os
+
+
 from flask import Flask, request, jsonify, session, send_file, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import hashlib
-import os
+
 import json
 from datetime import datetime
 import uuid
@@ -25,7 +31,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'ssl': {
             'ca': '/etc/ssl/certs/ca-certificates.crt' # ይህ በ Render ላይ ይሰራል
         }  
-}
+} }
 
 # Allowed file extensions for profile photos
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -702,5 +708,6 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     socketio.run(app, debug=False, host='0.0.0.0', port=port)
+
 
 
